@@ -1,6 +1,8 @@
-# PlacePatch
+# WhatIf
 
-**PlacePatch** turns a photo of a local place into a clearly labeled AI improvement concept, a community proposal people can support, and a downloadable request packet.
+**WhatIf** (codebase name: PlacePatch) turns a photo of a local place into a clearly labeled AI improvement concept, a community proposal people can support, and a downloadable request packet.
+
+> *What if this bus stop had shade?* Snap it, brush where the change goes, and let AI imagine it — then rally your neighbors.
 
 **Full loop:** sign in → take/upload photo → enter place + problem + consent → AI reads the scene and suggests changes → user picks one → user brushes the area to edit → AI generates the concept → AI review flags issues → user edits wording and approves → publish → others support (one each) → export a PDF packet.
 
@@ -34,7 +36,7 @@ backend/
   agents/        analyze/prompt/review/draft             (P2)
   imaging/       render adapters, mask utils, cli        (P3)
 workflows/       ComfyUI API-format workflow JSON        (P3)
-mobile/          Expo app exported from Rork             (P1)
+mobile/          Expo SDK 57 app — see mobile/README.md  (P1)
 web/             (later) Vite app                        (P1)
 deploy/          docker-compose.yml, Caddyfile, Dockerfile (P4)
 ```
@@ -56,6 +58,22 @@ For phone testing, expose the API with a tunnel and point `PUBLIC_BASE_URL`,
 `DJANGO_ALLOWED_HOSTS` and the mobile `EXPO_PUBLIC_API_BASE_URL` at the tunnel URL
 (see `docs/MASTER_PLAN.md` §9.5 step 8).
 
+Real AI (Gemini) needs `GEMINI_API_KEY`, `GEMINI_MODEL` and `GEMINI_IMAGE_MODEL`
+in `backend/.env` — see `docs/AI_SETUP.md`. **Restart `run_worker` after any
+`.env` change**; the worker reads settings only at startup.
+
+## Run the mobile app
+
+```bash
+cd mobile
+npm install
+cp ../config/mobile.env.example .env    # EXPO_PUBLIC_API_MODE=fixture works with no backend
+npx expo start -c                       # -c clears the Metro cache (needed after babel/config changes)
+```
+
+Full guide (fixture vs live mode, Android dev build, maps key): `mobile/README.md`.
+Something broken? `docs/TROUBLESHOOTING.md`.
+
 ## Validate the contract
 
 ```bash
@@ -63,16 +81,20 @@ python3 scripts/validate_fixtures.py   # fixtures vs openapi.yaml — must pass
 python3 scripts/sync_fixtures.py       # copy fixtures into mobile/ and web/
 ```
 
-## Backend tests (P4)
+## Tests
 
 ```bash
-cd backend && ../.venv/bin/python -m pytest core/tests/ -q
+# from the repo root, with the backend venv
+backend/.venv/bin/python -m pytest backend/agents backend/imaging -q
+backend/.venv/bin/python -m pytest backend/core/tests -q
+cd mobile && npx tsc --noEmit && npx expo-doctor
 ```
 
-58 tests: contract-shape validation against `openapi.yaml`, auth (JWT +
-dev bypass), support idempotency (incl. concurrent threads), revision
-conflicts, STALE_RESULT, publish gate, mask rasterization, worker lease
-reclaim, packet PDF.
+Backend core tests cover contract-shape validation against `openapi.yaml`,
+auth (JWT + dev bypass), support idempotency (incl. concurrent threads),
+revision conflicts, STALE_RESULT, publish gate, mask rasterization, worker
+lease reclaim and the packet PDF. Some newer upstream tests (posts) need
+models that are not committed yet — see `docs/HANDOFF.md`.
 
 Provider choices are env vars (`SCENE_PROVIDER`, `DRAFT_PROVIDER`,
 `REVIEW_PROVIDER`, `RENDER_PROVIDER` — `ollama` | `gemini` | `comfyui` |
