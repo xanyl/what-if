@@ -15,7 +15,7 @@ import { Text } from "../../../src/components/Text";
 import { Display } from "../../../src/ui/Display";
 import { Button } from "../../../src/ui/Button";
 import { useToast } from "../../../src/ui/Toast";
-import { api, ApiError, friendlyMessage, displayMessage } from "../../../src/api";
+import { api, ApiError, displayMessage } from "../../../src/api";
 import { config } from "../../../src/config";
 import { useProposal } from "../../../src/hooks/useProposal";
 import { BeforeAfterSlider } from "../../../src/components/BeforeAfterSlider";

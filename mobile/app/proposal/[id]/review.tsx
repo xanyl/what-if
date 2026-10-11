@@ -22,7 +22,7 @@ import { BeforeAfterSlider } from "../../../src/components/BeforeAfterSlider";
 import { FlagList } from "../../../src/components/FlagList";
 import { ErrorState } from "../../../src/components/ErrorState";
 import { SparkleIcon, WandIcon } from "../../../src/components/icons";
-import { api, ApiError, friendlyMessage, displayMessage } from "../../../src/api";
+import { api, ApiError, displayMessage } from "../../../src/api";
 import type { Proposal, ProposalPatch } from "../../../src/api/types";
 import { useProposal } from "../../../src/hooks/useProposal";
 import { theme } from "../../../src/theme";

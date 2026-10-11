@@ -12,7 +12,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Text } from "../../src/components/Text";
 import { Display } from "../../src/ui/Display";
 import { useToast } from "../../src/ui/Toast";
-import { api, ApiError, friendlyMessage, displayMessage } from "../../src/api";
+import { api, ApiError, displayMessage } from "../../src/api";
 import { useAuth } from "../../src/auth/AuthProvider";
 import { useFeed } from "../../src/hooks/useFeed";
 import { EmptyState } from "../../src/components/EmptyState";

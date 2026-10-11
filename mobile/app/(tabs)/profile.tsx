@@ -16,7 +16,7 @@ import { Button } from "../../src/ui/Button";
 import { Chip } from "../../src/ui/Chip";
 import { Field } from "../../src/ui/Field";
 import { useToast } from "../../src/ui/Toast";
-import { api, ApiError, friendlyMessage, displayMessage, getFixtureFailure, setFixtureFailure } from "../../src/api";
+import { api, ApiError, displayMessage, getFixtureFailure, setFixtureFailure } from "../../src/api";
 import type { FixtureFailure } from "../../src/api";
 import { useAuth } from "../../src/auth/AuthProvider";
 import { useFeed } from "../../src/hooks/useFeed";
