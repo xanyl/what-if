@@ -4,7 +4,10 @@
  * proposal's concept thumbnail in a sprout-green frame.
  */
 import React, { useEffect, useRef } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import Constants from "expo-constants";
+import { Text } from "./Text";
+import { MapIcon } from "./icons";
 import MapView, { Marker, type Region } from "react-native-maps";
 import { Image } from "expo-image";
 import type { ProposalSummary } from "../api/types";
@@ -41,7 +44,26 @@ function regionFor(points: LatLng[]): Region {
   };
 }
 
-export function ProposalMap({ pins, user, selectedId, onSelect, focus }: Props) {
+/** Android's Google map needs an API key baked in at build time (app.config.js). */
+const MAPS_AVAILABLE =
+  Platform.OS !== "android" || Constants.expoConfig?.extra?.androidMapsEnabled === true;
+
+export function ProposalMap(props: Props) {
+  if (!MAPS_AVAILABLE) {
+    return (
+      <View style={[StyleSheet.absoluteFill, styles.fallback]}>
+        <MapIcon size={40} color={theme.colors.accent} />
+        <Text style={styles.fallbackTitle}>Map needs a Google Maps key on Android</Text>
+        <Text style={styles.fallbackText}>
+          Set GOOGLE_MAPS_ANDROID_API_KEY and rebuild. Pinned ideas are listed below.
+        </Text>
+      </View>
+    );
+  }
+  return <NativeMap {...props} />;
+}
+
+function NativeMap({ pins, user, selectedId, onSelect, focus }: Props) {
   const ref = useRef<MapView>(null);
   const initial = regionFor([...pins.map((p) => p.at), ...(user ? [user] : [])]);
 
@@ -88,6 +110,9 @@ export function ProposalMap({ pins, user, selectedId, onSelect, focus }: Props) 
 }
 
 const styles = StyleSheet.create({
+  fallback: { alignItems: "center", justifyContent: "center", padding: 32, backgroundColor: theme.colors.accentSoft },
+  fallbackTitle: { marginTop: 10, fontSize: 15, fontWeight: "700", color: theme.colors.accentDark, textAlign: "center" },
+  fallbackText: { marginTop: 4, fontSize: 13, color: theme.colors.muted, textAlign: "center" },
   pin: {
     width: 46,
     height: 46,
