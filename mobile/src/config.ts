@@ -26,7 +26,7 @@ export const config = {
   auth0Audience: readEnv("EXPO_PUBLIC_AUTH0_AUDIENCE", "https://api.placepatch.dev"),
   auth0Scheme: readEnv("EXPO_PUBLIC_AUTH0_SCHEME", "placepatch"),
   jobPollMs: parseInt(readEnv("EXPO_PUBLIC_JOB_POLL_MS", "2000"), 10),
-  appVersion: "1.0.0",
+  appVersion: "1.1.0",
 };
 
 export type AppConfig = typeof config;
