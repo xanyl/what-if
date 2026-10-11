@@ -52,3 +52,15 @@ Fill in at G0 (see `docs/MASTER_PLAN.md` §15). Client IDs are public; never rec
 - [x] `imaging/errors.py` now re-exports the canonical `backend/common/errors.py` classes (single class identity for isinstance checks across modules).
 - [x] `openai>=1` added to `backend/requirements.txt` and installed into `.venv`.
 - [ ] To enable the OpenAI leg: set `OPENAI_API_KEY` in `backend/.env` (gitignored). No key is needed for tests (all mocked).
+
+## 2026-10-11 — WhatIf mobile + live Gemini pipeline (P1, with P2/P3/P4 touch points)
+
+- [x] **Name:** user-facing app name is **WhatIf**; bundle id / scheme stay `dev.placepatch.mobile` / `placepatch` so Auth0 callbacks keep working.
+- [x] **Gemini models:** `gemini-3.8-flash` (text) and `gemini-3.1-flash-image` (render); 2.x IDs return 404. Key sent via `x-goog-api-key` header (was a URL query param that leaked into logs).
+- [x] **Render honesty:** `pipeline._imaging_render` only uses the inline fake render when `backend.imaging` cannot be imported; real provider errors fail the job (retryable). Root cause found: providers read `prompt.editGoal` but agents send `edit_goal` → AttributeError → silent fake.
+- [x] **Uploads (SDK 57):** global `fetch` is `expo/fetch`, which rejects RN `{ uri }` FormData parts; the client sends a `bytes()` part read via expo-file-system. Network failures now say "Couldn't reach the server" (`ApiError.network`), not "AI service is down".
+- [x] **Map / Nearby without a contract change:** coordinates come from the author's capture location (stored on device, never uploaded) or OS geocoding of `placeLabel`. Topic filters (Transit/Streets/Parks) are client-side keyword tags; `category` stays `shade`.
+- [x] **Android maps key:** `GOOGLE_MAPS_ANDROID_API_KEY` via `mobile/app.config.js`; no key → placeholder, never a crash.
+- [x] **Brush canvas:** gesture handlers run on the JS thread (`runOnJS(true)`), live stroke kept in a ref and committed once per stroke; eraser renders through an SVG mask so it matches the server's paint-minus-erase raster.
+- [x] **Dependencies:** `react`/`react-dom`/`react-native` pinned to SDK 57 versions; duplicate worklets Babel plugin removed.
+- [ ] **Open (upstream):** `core/tests/*`, `agents/tests/test_agents.py` and migration `0002_*` reference `Post`, `AssetKind`, `ModerationResult`, which are not in `core/models.py` / `agents/schemas.py`. Do not run `migrate` until those models land — see `docs/HANDOFF.md`.
